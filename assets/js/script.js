@@ -1,23 +1,103 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
-$(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+$(document).ready(function () {
+  var displayedHour = dayjs().format("H");
+  var currentHour = dayjs().format("H");
+  createCalendar();
+
+  updateBlockColor();
+  loadSavedEvents();
+  setInterval(updateClock, 1000);
+
+  // Event listener for clicking on the save button
+  // TODO if blank, delete the item from local storage
+  $(".saveBtn").on("click", function () {
+    let calendarBlock = $(this).parent().attr("id");
+    localStorage.setItem(
+      calendarBlock,
+      $(this).parent().find("textarea").val()
+    );
+  });
+
+  function createCalendar() {
+    // TODO Add this as a text box on the page to grab from the user?
+    let startTime = 8;
+    let endTime = 16;
+
+    for (let i = startTime; i <= endTime; i++) {
+      let calendar = document.getElementById("calendar");
+
+      let timeBlock = document.createElement("div");
+      timeBlock.setAttribute("class", "row time-block");
+      timeBlock.setAttribute("id", "hour-" + i);
+      calendar.appendChild(timeBlock);
+
+      let timeText = document.createElement("div");
+      timeText.setAttribute("class", "col-2 col-md-1 hour text-center py-3");
+      timeText.innerText = dayjs().hour(i).format("hA");
+      timeBlock.appendChild(timeText);
+
+      let textArea = document.createElement("textarea");
+      textArea.setAttribute("class", "col-8 col-md-10 description");
+      textArea.setAttribute("rows", "3");
+      timeBlock.appendChild(textArea);
+
+      let saveButton = document.createElement("button");
+      saveButton.setAttribute("class", "btn saveBtn col-2 col-md-1");
+      saveButton.setAttribute("aria-label", "save");
+      timeBlock.appendChild(saveButton);
+
+      let icon = document.createElement("i");
+      icon.setAttribute("class", "fas fa-save");
+      icon.setAttribute("aria-hidden", "true");
+      saveButton.appendChild(icon);
+    }
+  }
+
+  // Updates the background color of the time blocks
+  function updateBlockColor() {
+    // Make this more efficient by only updating the blocks that need to be updated
+    $(".time-block").each(function () {
+      let calendarBlockHour = parseInt($(this).attr("id").split("-")[1]);
+      if (calendarBlockHour < currentHour) {
+        $(this).removeClass("present");
+        $(this).removeClass("future");
+        $(this).addClass("past");
+      } else if (calendarBlockHour > currentHour) {
+        $(this).removeClass("present");
+        $(this).addClass("future");
+        $(this).removeClass("past");
+      } else {
+        $(this).addClass("present");
+        $(this).removeClass("future");
+        $(this).removeClass("past");
+      }
+    });
+  }
+
+  // Used at startup to load any saved events from local storage
+  function loadSavedEvents() {
+    $(".time-block").each(function () {
+      let calendarBlock = $(this).attr("id");
+      let savedEvent = localStorage.getItem(calendarBlock);
+      if (savedEvent) {
+        $(this).find("textarea").val(savedEvent);
+      }
+    });
+  }
+
+  // Displays the current time in the header
+  function updateClock() {
+    let currentTime = dayjs().format("MMMM D YYYY, h:mm:ss a");
+    $("#currentTime").html(currentTime);
+
+    // TODOD Change this to use the existing current Time hour
+    currentHour = dayjs().format("H");
+
+    if (currentHour != displayedHour) {
+      displayedHour = currentHour;
+      updateBlockColor();
+    }
+  }
 });
