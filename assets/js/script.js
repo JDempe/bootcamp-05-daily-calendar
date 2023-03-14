@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  // Global variabels for the current actual hour and the hour being displayed
+  // Global variables for the current actual hour and the hour being displayed
   var displayedHour = dayjs().format("H");
   var currentHour = dayjs().format("H");
 
