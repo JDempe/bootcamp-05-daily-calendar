@@ -28,7 +28,7 @@ $(document).ready(function () {
     } else if ($(this).parent().find("textarea").val() == localStorage.getItem(calendarBlock)) { 
       return;
      } else {
-      localStorage.setItem(calendarBlock,n$(this).parent().find("textarea").val());
+      localStorage.setItem(calendarBlock, $(this).parent().find("textarea").val());
       window.alert("Event saved!");
     }
   });
