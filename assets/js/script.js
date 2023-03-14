@@ -1,50 +1,76 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
 $(document).ready(function () {
+  // Global variabels for the current actual hour and the hour being displayed
   var displayedHour = dayjs().format("H");
   var currentHour = dayjs().format("H");
-  createCalendar();
 
+  // Global variables for the start and end times of the work day
+  var startTime = 8;
+  var endTime = 16;
+
+  // Create the calendar, update the block colors, and load the local storag events
+  createCalendar();
   updateBlockColor();
   loadSavedEvents();
+
+  // Create asychronous loop to update the displayed time every second
   setInterval(updateClock, 1000);
 
   // Event listener for clicking on the save button
-  // TODO if blank, delete the item from local storage
   $(".saveBtn").on("click", function () {
     let calendarBlock = $(this).parent().attr("id");
-    localStorage.setItem(
-      calendarBlock,
-      $(this).parent().find("textarea").val()
-    );
+
+    // If the text area is empty, remove the event from local storage
+    // Else if the text area is unchanged, do nothing
+    // Otherwise save the event and display a popup to confirm the event was saved
+    if ($(this).parent().find("textarea").val() == "") {
+      localStorage.removeItem(calendarBlock);
+      return;
+    } else if ($(this).parent().find("textarea").val() == localStorage.getItem(calendarBlock)) { 
+      return;
+     } else {
+      localStorage.setItem(calendarBlock,n$(this).parent().find("textarea").val());
+      window.alert("Event saved!");
+    }
   });
 
-  function createCalendar() {
-    // TODO Add this as a text box on the page to grab from the user?
-    let startTime = 8;
-    let endTime = 16;
+  // Displays the current time in the header and checks if the hour has changed
+  function updateClock() {
+    // Gather current time and display it in the header
+    let currentTime = dayjs().format("MMMM D YYYY, h:mm:ss a");
+    $("#currentTime").html(currentTime);
 
+    // Gather current hour, for comparison to the displayed hour
+    currentHour = dayjs().format("H");
+
+    // If the hour has changed, update the displayed hour and update the block colors
+    if (currentHour != displayedHour) {
+      displayedHour = currentHour;
+      updateBlockColor();
+    }
+  }
+
+  // Creates the calendar based on the provided start and end times for the work day
+  function createCalendar() {
     for (let i = startTime; i <= endTime; i++) {
       let calendar = document.getElementById("calendar");
 
       let timeBlock = document.createElement("div");
-      timeBlock.setAttribute("class", "row time-block");
+      timeBlock.setAttribute("class", "time-block row ");
       timeBlock.setAttribute("id", "hour-" + i);
       calendar.appendChild(timeBlock);
 
       let timeText = document.createElement("div");
-      timeText.setAttribute("class", "col-2 col-md-1 hour text-center py-3");
+      timeText.setAttribute("class", "hour col-2 col-md-1 text-center py-3");
       timeText.innerText = dayjs().hour(i).format("hA");
       timeBlock.appendChild(timeText);
 
       let textArea = document.createElement("textarea");
-      textArea.setAttribute("class", "col-8 col-md-10 description");
+      textArea.setAttribute("class", "eventText col-8 col-md-10");
       textArea.setAttribute("rows", "3");
       timeBlock.appendChild(textArea);
 
       let saveButton = document.createElement("button");
-      saveButton.setAttribute("class", "btn saveBtn col-2 col-md-1");
+      saveButton.setAttribute("class", "saveBtn btn col-2 col-md-1");
       saveButton.setAttribute("aria-label", "save");
       timeBlock.appendChild(saveButton);
 
@@ -57,21 +83,20 @@ $(document).ready(function () {
 
   // Updates the background color of the time blocks
   function updateBlockColor() {
-    // Make this more efficient by only updating the blocks that need to be updated
     $(".time-block").each(function () {
+      // Get the hour from the id of the time block
       let calendarBlockHour = parseInt($(this).attr("id").split("-")[1]);
+
+      // Determine if the time block is in the past, present, or future and set the background color accordingly
       if (calendarBlockHour < currentHour) {
-        $(this).removeClass("present");
-        $(this).removeClass("future");
         $(this).addClass("past");
+        $(this).removeClass("present future");
       } else if (calendarBlockHour > currentHour) {
-        $(this).removeClass("present");
         $(this).addClass("future");
-        $(this).removeClass("past");
+        $(this).removeClass("past present");
       } else {
         $(this).addClass("present");
-        $(this).removeClass("future");
-        $(this).removeClass("past");
+        $(this).removeClass("past future");
       }
     });
   }
@@ -85,19 +110,5 @@ $(document).ready(function () {
         $(this).find("textarea").val(savedEvent);
       }
     });
-  }
-
-  // Displays the current time in the header
-  function updateClock() {
-    let currentTime = dayjs().format("MMMM D YYYY, h:mm:ss a");
-    $("#currentTime").html(currentTime);
-
-    // TODOD Change this to use the existing current Time hour
-    currentHour = dayjs().format("H");
-
-    if (currentHour != displayedHour) {
-      displayedHour = currentHour;
-      updateBlockColor();
-    }
   }
 });

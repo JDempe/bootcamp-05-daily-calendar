@@ -1,9 +1,25 @@
+/* Body defaults */
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
 }
 
-textarea {
+/* Each row of the calendar */
+.time-block {
+  border-radius: 15px;
+  border-top: 1px solid white;
+}
+
+/* Hour text box on left of each calendar row */
+.hour {
+  background-color: #ffffff;
+  color: #000000;
+  border-top: 1px dashed #000000;
+}
+
+/* Text description of event for each calendar row */
+.eventText {
+  white-space: pre-wrap;
   background: transparent;
   border: none;
   resize: none;
@@ -12,39 +28,7 @@ textarea {
   padding: 10px;
 }
 
-.description {
-  white-space: pre-wrap;
-}
-
-.time-block {
-  border-radius: 15px;
-}
-
-.row {
-  border-top: 1px solid white;
-}
-
-.hour {
-  background-color: #ffffff;
-  color: #000000;
-  border-top: 1px dashed #000000;
-}
-
-.past {
-  background-color: #d3d3d3;
-  color: white;
-}
-
-.present {
-  background-color: #ff6961;
-  color: white;
-}
-
-.future {
-  background-color: #77dd77;
-  color: white;
-}
-
+/* Save Button on right for each calendar row */
 .saveBtn {
   border-left: 1px solid black;
   border-top-right-radius: 15px;
@@ -53,7 +37,27 @@ textarea {
   color: white;
 }
 
-.saveBtn i:hover {
+/* Save Button expand icon on hover */
+.saveBtn:hover {
   font-size: 20px;
   transition: all 0.3s ease-in-out;
+}
+
+
+/* Past color for time-block */
+.past {
+  background-color: #d3d3d3;
+  color: white;
+}
+
+/* Present color for time-block */
+.present {
+  background-color: #ff6961;
+  color: white;
+}
+
+/* Future color for time-block */
+.future {
+  background-color: #77dd77;
+  color: white;
 }
